@@ -16,3 +16,6 @@
 *.local.yaml
 *.local.json
 *.local.txt
+
+# Go
+/dist
