@@ -1,4 +1,5 @@
 FROM debian:12-slim
+LABEL org.opencontainers.image.source=https://github.com/ondrejsika/counter-frontend-go
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY counter-frontend-go /usr/local/bin
 CMD [ "/usr/local/bin/counter-frontend-go" ]
