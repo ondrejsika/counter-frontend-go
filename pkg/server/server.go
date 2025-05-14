@@ -84,6 +84,10 @@ func Server() {
 		</body></html>
 		`)
 	})
+	http.HandleFunc("/api/livez", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"live": true}`)
+	})
 	fmt.Println("Listen on 0.0.0.0:3000, see http://127.0.0.1:3000")
 	http.ListenAndServe(":3000", nil)
 }
