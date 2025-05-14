@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/ondrejsika/counter-frontend-go/version"
 )
 
 //go:embed favicon.ico
@@ -87,6 +89,10 @@ func Server() {
 	http.HandleFunc("/api/livez", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"live": true}`)
+	})
+	http.HandleFunc("/api/version", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"version": "`+version.Version+`"}`)
 	})
 	fmt.Println("Listen on 0.0.0.0:3000, see http://127.0.0.1:3000")
 	http.ListenAndServe(":3000", nil)
