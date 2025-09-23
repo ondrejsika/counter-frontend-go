@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build
 
-FROM debian:12-slim
+FROM debian:13-slim
 LABEL org.opencontainers.image.source=https://github.com/ondrejsika/counter-frontend-go
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /build/counter-frontend-go /usr/local/bin/counter-frontend-go
