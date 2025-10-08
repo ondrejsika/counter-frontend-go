@@ -37,6 +37,13 @@ func Server() {
 
 	hostname, _ := os.Hostname()
 
+	err := checkApiStatus(apiOrigin)
+	if err != nil {
+		if failOnError {
+			log.Fatalln("Quitting due to error and FAIL_ON_ERROR=1:", err)
+		}
+	}
+
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/x-icon")
 		w.WriteHeader(http.StatusOK)
@@ -129,4 +136,18 @@ func api(origin string) (int, string, string, string, error) {
 	}
 
 	return data.Counter, data.Hostname, data.Version, data.ExtraText, nil
+}
+
+func checkApiStatus(origin string) error {
+	resp, err := http.Get(origin + "/api/status")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("API status is not OK: %d", resp.StatusCode)
+	}
+
+	return nil
 }
