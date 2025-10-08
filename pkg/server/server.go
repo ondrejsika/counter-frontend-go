@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -14,6 +15,11 @@ import (
 var favicon []byte
 
 func Server() {
+	failOnError := false
+	if os.Getenv("FAIL_ON_ERROR") == "1" {
+		failOnError = true
+	}
+
 	apiOrigin := "http://127.0.0.1"
 	if os.Getenv("API_ORIGIN") != "" {
 		apiOrigin = os.Getenv("API_ORIGIN")
@@ -37,7 +43,12 @@ func Server() {
 		w.Write(favicon)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		counter, backendHostname, _, extraText, _ := api(apiOrigin)
+		counter, backendHostname, _, extraText, err := api(apiOrigin)
+		if err != nil {
+			if failOnError {
+				log.Fatalln("Quitting due to error and FAIL_ON_ERROR=1:", err)
+			}
+		}
 		counterStr := fmt.Sprintf("%d", counter)
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprint(w, `<!DOCTYPE html>
