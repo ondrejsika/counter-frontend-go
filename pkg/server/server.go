@@ -119,13 +119,13 @@ func api(origin string) (int, string, string, string, error) {
 
 	resp, err := http.Get(origin + "/api/counter")
 	if err != nil {
-		return 0, "", "", "", err
+		return -1, "", "", "", err
 	}
 	defer resp.Body.Close()
 
 	var data CounterResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return 0, "", "", "", err
+		return -1, "", "", "", err
 	}
 
 	return data.Counter, data.Hostname, data.Version, data.ExtraText, nil
