@@ -1,5 +1,10 @@
 # counter-frontend-go
 
+## Container Images
+
+- `ghcr.io/ondrejsika/counter-frontend-go`
+
+
 ## Configuration
 
 - `API_ORIGIN` - Origin of the API server (default: `http://127.0.0.1`)
