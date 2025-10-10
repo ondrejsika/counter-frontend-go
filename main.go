@@ -1,7 +1,9 @@
 package main
 
-import "github.com/ondrejsika/counter-frontend-go/pkg/server"
+import (
+	"github.com/ondrejsika/counter-frontend-go/cmd"
+)
 
 func main() {
-	server.Server()
+	cmd.Execute()
 }
