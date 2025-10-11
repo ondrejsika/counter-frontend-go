@@ -20,7 +20,7 @@ func Server() {
 		failOnError = true
 	}
 
-	apiOrigin := "http://127.0.0.1"
+	apiOrigin := "http://127.0.0.1:8000"
 	if os.Getenv("API_ORIGIN") != "" {
 		apiOrigin = os.Getenv("API_ORIGIN")
 	}
