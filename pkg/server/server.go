@@ -15,6 +15,11 @@ import (
 var favicon []byte
 
 func Server() {
+	port := "3000"
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+
 	failOnError := false
 	if os.Getenv("FAIL_ON_ERROR") == "1" {
 		failOnError = true
@@ -112,8 +117,8 @@ func Server() {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"version": "`+version.Version+`"}`)
 	})
-	fmt.Println("Listen on 0.0.0.0:3000, see http://127.0.0.1:3000")
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("Listen on 0.0.0.0:" + port + ", see http://127.0.0.1:" + port)
+	http.ListenAndServe(":"+port, nil)
 }
 
 func api(origin string) (int, string, string, string, error) {
