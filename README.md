@@ -12,3 +12,9 @@
 - `FONT_COLOR` - Color of the counter text (default: `#000000`, black)
 - `BACKGROUND_COLOR` - Color of the counter background (default: `#ffffff`, white)
 - `FAIL_ON_ERROR` - Exit with fatal error when API request fails (set to `1` to enable, useful for Kubernetes probes)
+
+## Endpoints
+
+- **GET /** - Returns the main HTML page with the counter.
+- **GET `/api/livez`** - Liveness probe endpoint for health checks (e.g., Kubernetes).
+- **GET `/api/version`** - Returns the application version.
