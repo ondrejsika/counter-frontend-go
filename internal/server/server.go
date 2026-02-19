@@ -25,6 +25,11 @@ func Server() {
 		failOnError = true
 	}
 
+	readOnly := false
+	if os.Getenv("READ_ONLY") == "1" {
+		readOnly = true
+	}
+
 	apiOrigin := "http://127.0.0.1:8000"
 	if os.Getenv("API_ORIGIN") != "" {
 		apiOrigin = os.Getenv("API_ORIGIN")
@@ -55,7 +60,7 @@ func Server() {
 		w.Write(favicon)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		counter, backendHostname, _, extraText, err := api(apiOrigin)
+		counter, backendHostname, _, extraText, err := api(apiOrigin, readOnly)
 		if err != nil {
 			if failOnError {
 				log.Fatalln("Quitting due to error and FAIL_ON_ERROR=1:", err)
@@ -121,7 +126,7 @@ func Server() {
 	http.ListenAndServe(":"+port, nil)
 }
 
-func api(origin string) (int, string, string, string, error) {
+func api(origin string, readOnly bool) (int, string, string, string, error) {
 	type CounterResponse struct {
 		Counter   int    `json:"counter"`
 		Hostname  string `json:"hostname"`
@@ -129,7 +134,12 @@ func api(origin string) (int, string, string, string, error) {
 		ExtraText string `json:"extra_text"`
 	}
 
-	resp, err := http.Get(origin + "/api/counter")
+	apiPath := origin + "/api/counter"
+	if readOnly {
+		apiPath = origin + "/api/read-counter"
+	}
+
+	resp, err := http.Get(apiPath)
 	if err != nil {
 		return -1, "", "", "", err
 	}
