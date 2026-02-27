@@ -4,12 +4,14 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/ondrejsika/counter-frontend-go/version"
+	"github.com/rs/zerolog"
 )
+
+var Logger zerolog.Logger
 
 //go:embed favicon.ico
 var favicon []byte
@@ -45,12 +47,14 @@ func Server() {
 		backgroundColor = os.Getenv("BACKGROUND_COLOR")
 	}
 
+	Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+
 	hostname, _ := os.Hostname()
 
 	err := checkApiStatus(apiOrigin)
 	if err != nil {
 		if failOnError {
-			log.Fatalln("Quitting due to error and FAIL_ON_ERROR=1:", err)
+			Logger.Fatal().Str("hostname", hostname).Msg("Quitting due to error and FAIL_ON_ERROR=1: " + err.Error())
 		}
 	}
 
@@ -63,9 +67,15 @@ func Server() {
 		counter, backendHostname, _, extraText, err := api(apiOrigin, readOnly)
 		if err != nil {
 			if failOnError {
-				log.Fatalln("Quitting due to error and FAIL_ON_ERROR=1:", err)
+				Logger.Fatal().Str("hostname", hostname).Msg("Quitting due to error and FAIL_ON_ERROR=1: " + err.Error())
 			}
 		}
+		Logger.Info().
+			Str("hostname", hostname).
+			Str("method", r.Method).
+			Str("path", r.URL.Path).
+			Int("counter", counter).
+			Msg(r.Method + " " + r.URL.Path)
 		counterStr := fmt.Sprintf("%d", counter)
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprint(w, `<!DOCTYPE html>
@@ -115,14 +125,24 @@ func Server() {
 		`)
 	})
 	http.HandleFunc("/api/livez", func(w http.ResponseWriter, r *http.Request) {
+		Logger.Info().
+			Str("hostname", hostname).
+			Str("method", r.Method).
+			Str("path", r.URL.Path).
+			Msg(r.Method + " " + r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"live": true}`)
 	})
 	http.HandleFunc("/api/version", func(w http.ResponseWriter, r *http.Request) {
+		Logger.Info().
+			Str("hostname", hostname).
+			Str("method", r.Method).
+			Str("path", r.URL.Path).
+			Msg(r.Method + " " + r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"version": "`+version.Version+`"}`)
 	})
-	fmt.Println("Listen on 0.0.0.0:" + port + ", see http://127.0.0.1:" + port)
+	Logger.Info().Str("hostname", hostname).Msg("Listen on 0.0.0.0:" + port + ", see http://127.0.0.1:" + port)
 	http.ListenAndServe(":"+port, nil)
 }
 
