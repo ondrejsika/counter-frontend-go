@@ -118,7 +118,7 @@ func Server() {
 				<h1>`+extraText+`</h1>
 				<h1>`+counterStr+`</h1>
 				<h2>`+hostname+` `+backendVersion+`</h2>
-				<h2>`+backendHostname+`</h2>
+				<h2>`+backendHostname+` `+version.Version+`</h2>
 			</div>
 		</section>
 		</body></html>
