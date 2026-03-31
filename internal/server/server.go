@@ -64,7 +64,7 @@ func Server() {
 		w.Write(favicon)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		counter, backendHostname, _, extraText, err := api(apiOrigin, readOnly)
+		counter, backendHostname, backendVersion, extraText, err := api(apiOrigin, readOnly)
 		if err != nil {
 			if failOnError {
 				Logger.Fatal().Str("hostname", hostname).Msg("Quitting due to error and FAIL_ON_ERROR=1: " + err.Error())
@@ -117,7 +117,7 @@ func Server() {
 				<h1>👋</h1>
 				<h1>`+extraText+`</h1>
 				<h1>`+counterStr+`</h1>
-				<h2>`+hostname+`</h2>
+				<h2>`+hostname+` `+backendVersion+`</h2>
 				<h2>`+backendHostname+`</h2>
 			</div>
 		</section>
