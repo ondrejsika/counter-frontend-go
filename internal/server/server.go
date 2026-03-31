@@ -16,7 +16,11 @@ var Logger zerolog.Logger
 //go:embed favicon.ico
 var favicon []byte
 
-func Server() {
+func Server(versionOverride string) {
+	if versionOverride != "" {
+		version.Version = versionOverride
+	}
+
 	port := "3000"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
