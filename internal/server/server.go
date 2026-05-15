@@ -81,52 +81,9 @@ func Server(versionOverride string) {
 			Int("counter", counter).
 			Msg(r.Method + " " + r.URL.Path)
 		counterStr := fmt.Sprintf("%d", counter)
-		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, `<!DOCTYPE html>
-		<html lang="en"><head>
-		<meta charset="UTF-8">
-		<title>`+extraText+`</title>
-		<style>
-		html, body {
-			height: 100%;
-			color: `+fontColor+`;
-			background-color: `+backgroundColor+`
-		}
-		.center-parent {
-			width: 100%;
-			height: 100%;
-			display: table;
-			text-align: center;
-		}
-		.center-parent > .center-child {
-			display: table-cell;
-			vertical-align: middle;
-		}
-		</style>
-		<style>
-		h1 {
-			font-family: Arial;
-			font-size: 5em;
-		}
-		h2 {
-			font-family: Arial;
-			font-size: 2em;
-		}
-		</style>
-		<link rel="icon" href="/favicon.ico">
-		</head>
-		<body>
-		<section class="center-parent">
-			<div class="center-child">
-				<h1>👋</h1>
-				<h1>`+extraText+`</h1>
-				<h1>`+counterStr+`</h1>
-				<h2>`+hostname+` `+version.Version+`</h2>
-				<h2>`+backendHostname+` `+backendVersion+`</h2>
-			</div>
-		</section>
-		</body></html>
-		`)
+		indexHtml(
+			w, hostname, backendHostname, backendVersion, extraText,
+			fontColor, backgroundColor, counterStr)
 	})
 	http.HandleFunc("/api/livez", func(w http.ResponseWriter, r *http.Request) {
 		Logger.Info().
@@ -189,4 +146,53 @@ func checkApiStatus(origin string) error {
 	}
 
 	return nil
+}
+
+func indexHtml(w http.ResponseWriter, hostname, backendHostname, backendVersion, extraText, fontColor, backgroundColor, counterStr string) {
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, `<!DOCTYPE html>
+		<html lang="en"><head>
+		<meta charset="UTF-8">
+		<title>`+extraText+`</title>
+		<style>
+		html, body {
+			height: 100%;
+			color: `+fontColor+`;
+			background-color: `+backgroundColor+`
+		}
+		.center-parent {
+			width: 100%;
+			height: 100%;
+			display: table;
+			text-align: center;
+		}
+		.center-parent > .center-child {
+			display: table-cell;
+			vertical-align: middle;
+		}
+		</style>
+		<style>
+		h1 {
+			font-family: Arial;
+			font-size: 5em;
+		}
+		h2 {
+			font-family: Arial;
+			font-size: 2em;
+		}
+		</style>
+		<link rel="icon" href="/favicon.ico">
+		</head>
+		<body>
+		<section class="center-parent">
+			<div class="center-child">
+				<h1>👋</h1>
+				<h1>`+extraText+`</h1>
+				<h1>`+counterStr+`</h1>
+				<h2>`+hostname+` `+version.Version+`</h2>
+				<h2>`+backendHostname+` `+backendVersion+`</h2>
+			</div>
+		</section>
+		</body></html>
+		`)
 }
