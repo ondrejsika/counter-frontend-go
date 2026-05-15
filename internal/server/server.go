@@ -121,8 +121,8 @@ func Server(versionOverride string) {
 				<h1>👋</h1>
 				<h1>`+extraText+`</h1>
 				<h1>`+counterStr+`</h1>
-				<h2>`+hostname+` `+backendVersion+`</h2>
-				<h2>`+backendHostname+` `+version.Version+`</h2>
+				<h2>`+hostname+` `+version.Version+`</h2>
+				<h2>`+backendHostname+` `+backendVersion+`</h2>
 			</div>
 		</section>
 		</body></html>
