@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/ondrejsika/counter-frontend-go/version"
 	"github.com/rs/zerolog"
@@ -81,9 +82,27 @@ func Server(versionOverride string) {
 			Int("counter", counter).
 			Msg(r.Method + " " + r.URL.Path)
 		counterStr := fmt.Sprintf("%d", counter)
-		indexHtml(
-			w, hostname, backendHostname, backendVersion, extraText,
-			fontColor, backgroundColor, counterStr)
+
+		// Check if User-Agent header exists
+		if userAgentList, ok := r.Header["User-Agent"]; ok {
+			// Check if User-Agent header has some data
+			if len(userAgentList) > 0 {
+				// If User-Agent starts with curl, use plain text
+				if strings.HasPrefix(userAgentList[0], "curl") {
+					indexPlainText(w, hostname, backendHostname, backendVersion, extraText, counterStr)
+				} else {
+					// If User-Agent header presents and not starts with curl
+					// use HTML (Chrome, Safari, Firefox, ...)
+					indexHtml(
+						w, hostname, backendHostname, backendVersion, extraText,
+						fontColor, backgroundColor, counterStr)
+				}
+			}
+		} else {
+			// If User-Agent header doesn't exists, use plain text
+			indexPlainText(
+				w, hostname, backendHostname, backendVersion, extraText, counterStr)
+		}
 	})
 	http.HandleFunc("/api/livez", func(w http.ResponseWriter, r *http.Request) {
 		Logger.Info().
@@ -148,7 +167,10 @@ func checkApiStatus(origin string) error {
 	return nil
 }
 
-func indexHtml(w http.ResponseWriter, hostname, backendHostname, backendVersion, extraText, fontColor, backgroundColor, counterStr string) {
+func indexHtml(
+	w http.ResponseWriter, hostname, backendHostname, backendVersion,
+	extraText, fontColor, backgroundColor, counterStr string,
+) {
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, `<!DOCTYPE html>
 		<html lang="en"><head>
@@ -195,4 +217,13 @@ func indexHtml(w http.ResponseWriter, hostname, backendHostname, backendVersion,
 		</section>
 		</body></html>
 		`)
+}
+
+func indexPlainText(
+	w http.ResponseWriter, hostname, backendHostname, backendVersion,
+	extraText, counterStr string,
+) {
+	w.Header().Set("Content-Type", "text/plain")
+	fmt.Fprint(w, `👋 `+extraText+` `+counterStr+` `+hostname+` `+version.Version+
+		` `+backendHostname+` `+backendVersion)
 }
